@@ -1,0 +1,77 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
+import { LoginResponse, User, UserRole } from './user.interface';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class Auth {
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:8080/auth';
+
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
+
+  constructor() {
+    this.checkToken();
+  }
+
+  // --- LOGIN ---
+  login(credentials: {email: string, password: string}): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap(response => {
+
+        localStorage.setItem('token', response.token);
+
+        this.setUserState(response.token);
+      })
+    );
+  }
+
+  register(data: {name: string, email: string, password: string}): Observable<User> {
+    const payload = {
+      ...data,
+      role: 'USER'
+    };
+    return this.http.post<User>(`${this.apiUrl}/register`, payload);
+  }
+
+  // --- LOGOUT ---
+  logout(): void {
+    localStorage.removeItem('token');
+    this.currentUserSubject.next(null);
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  hasRole(requiredRole: UserRole): boolean {
+    const user = this.currentUserSubject.value;
+    return user?.role === requiredRole;
+  }
+
+  private checkToken() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.setUserState(token);
+    }
+  }
+
+  private setUserState(token: string) {
+    try {
+      const decoded: any = jwtDecode(token);
+
+      this.currentUserSubject.next({
+        id: decoded.id,
+        email: decoded.sub,
+        name: decoded.name || 'Usuário',
+        role: decoded.role as UserRole
+      });
+    } catch (e) {
+      this.logout();
+    }
+  }
+}
