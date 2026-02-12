@@ -1,14 +1,14 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Auth } from '../auth';
+import { Auth } from '../auth'; 
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -17,24 +17,68 @@ export class Login {
   private auth = inject(Auth);
   private router = inject(Router);
 
+
+  isRightPanelActive: boolean = false; 
+  showLoginPass: boolean = false;      
+  showRegisterPass: boolean = false;  
+  showConfirmPass: boolean = false;    
+
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
-  async onSubmit() {
-    if(this.loginForm.valid){
-      const { email, password } = this.loginForm.value;
 
+  registerForm: FormGroup = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(3)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', [Validators.required]]
+  }, { validators: this.passwordMatchValidator });
+
+
+  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password')?.value;
+    const confirmPassword = control.get('confirmPassword')?.value;
+    return password !== confirmPassword ? { passwordMismatch: true } : null;
+  }
+
+  async onLogin() {
+    if(this.loginForm.valid) {
       try {
-        await firstValueFrom(this.auth.login({ email, password }));
-
+        await firstValueFrom(this.auth.login(this.loginForm.value));
         await this.router.navigate(['/home']);
-
       } catch (error) {
-        console.error(error);
-        alert('Login falhou! Verifique suas credenciais.');
+        alert('Falha no login! Verifique suas credenciais.');
       }
+    } else {
+      this.loginForm.markAllAsTouched();
     }
   }
+
+
+  async onRegister() {
+    if (this.registerForm.valid) {
+      try {
+        
+        await firstValueFrom(this.auth.register(this.registerForm.value));
+        alert('Cadastro realizado com sucesso! Faça login.');
+        this.togglePanel(); 
+        this.registerForm.reset();
+      } catch (error: any) {
+        const msg = error?.error?.message || 'Erro ao realizar cadastro.';
+        alert(msg);
+      }
+    } else {
+      this.registerForm.markAllAsTouched();
+    }
+  }
+
+  togglePanel() {
+    this.isRightPanelActive = !this.isRightPanelActive;
+  }
+
+  toggleLoginPass() { this.showLoginPass = !this.showLoginPass; }
+  toggleRegisterPass() { this.showRegisterPass = !this.showRegisterPass; }
+  toggleConfirmPass() { this.showConfirmPass = !this.showConfirmPass; }
 }
