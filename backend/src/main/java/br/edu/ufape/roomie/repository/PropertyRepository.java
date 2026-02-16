@@ -16,12 +16,14 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             "AND (:state IS NULL OR a.state = :state) " +
             "AND (:district IS NULL OR a.district = :district) " +
             "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
-            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) ")
-    List<Property> PropertyFilter(
+            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) " +
+            "AND (:availableVacancies IS NULL OR p.availableVacancies >= :availableVacancies) ")
+    List<Property> findWithFilters(
         @Param("city") String city,
         @Param("state") String state,
         @Param("district") String district,
         @Param("minPrice") Double minPrice,
-        @Param("maxPrice") Double maxPrice
+        @Param("maxPrice") Double maxPrice,
+        @Param("availableVacancies") Integer availableVacancies
     );
 }

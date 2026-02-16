@@ -39,6 +39,9 @@ public class Property {
     @Column(name = "aceita_animais", nullable = false)
     private Boolean acceptAnimals;
 
+    @Column(name = "vagas_disponiveis", nullable = false)
+    private Integer availableVacancies;
+
     @OneToOne(mappedBy = "property", cascade = CascadeType.ALL)
     private Address address;
 }
