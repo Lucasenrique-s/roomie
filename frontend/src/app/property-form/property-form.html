@@ -76,6 +76,24 @@
 
     </div>
 
+    
+  <hr>
+    <h3>Fotos do Imóvel</h3>
+      
+    <div class="image-upload-section">
+       <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+        Adicione fotos para destacar seu anúncio.
+      </p>
+        
+      <button type="button" class="btn-image" (click)="toggleImageUpload()">
+          📸 Inserir Imagens
+      </button>
+
+      <div *ngIf="showImageUpload" style="margin-top: 20px;">
+        <app-image-upload></app-image-upload> 
+      </div>
+    </div>
+
     <button type="submit" [disabled]="propertyForm.invalid">Salvar Imóvel</button>
   </form>
 </div>

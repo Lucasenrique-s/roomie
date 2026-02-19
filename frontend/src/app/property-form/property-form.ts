@@ -2,17 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PropertyType } from '../models/property-type.enum';
+import { ImageUploadComponent } from '';
 
 @Component({
   selector: 'app-property-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule], 
   templateUrl: './property-form.html',
   styleUrls: ['./property-form.css']
 })
 export class PropertyFormComponent implements OnInit {
   propertyForm!: FormGroup;
   propertyTypes = Object.values(PropertyType);
+
+
+  showImageUpload: boolean = false;
 
   constructor(private fb: FormBuilder) {}
 
@@ -22,19 +26,19 @@ export class PropertyFormComponent implements OnInit {
         Validators.required, 
         Validators.minLength(5), 
         Validators.maxLength(100)
-      ]], // @Size(min=5, max=100)
+      ]], 
       
       description: [''],
       
       price: [null, [
         Validators.required, 
         Validators.min(0.01)
-      ]], // @Positive
+      ]], 
       
       availableVacancies: [null, [
         Validators.required, 
         Validators.min(1)
-      ]], // numero de quartos mapeado para availableVacancies (@Min(1))
+      ]], 
       
       type: [null, [Validators.required]],
 
@@ -48,9 +52,14 @@ export class PropertyFormComponent implements OnInit {
     });
   }
 
+  toggleImageUpload(): void {
+    this.showImageUpload = !this.showImageUpload;
+  }
+
   onSubmit(): void {
     if (this.propertyForm.valid) {
       console.log('Dados do formulário:', this.propertyForm.value);
+
     } else {
       this.propertyForm.markAllAsTouched();
     }
