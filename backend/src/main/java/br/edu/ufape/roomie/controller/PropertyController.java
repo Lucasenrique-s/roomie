@@ -24,12 +24,8 @@ public class PropertyController {
     }
 
     @PostMapping
-    public ResponseEntity<Property> store(@RequestBody PropertyRequestDTO dto, @AuthenticationPrincipal User loggedUser) {
-        if (loggedUser == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado.");
-        }
-
-        Property createdProperty = propertyService.createProperty(dto, loggedUser);
+    public ResponseEntity<Property> store(@RequestBody PropertyRequestDTO dto) {
+        Property createdProperty = propertyService.createProperty(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProperty);
     }
 }

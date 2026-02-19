@@ -23,10 +23,8 @@ public class PropertyService {
     }
 
     @Transactional
-    public Property createProperty(PropertyRequestDTO dto, User owner) {
-        if (owner == null) {
-            throw new IllegalArgumentException("O proprietário não pode ser nulo.");
-        }
+    public Property createProperty(PropertyRequestDTO dto) {
+        User owner = this.getAuthenticatedUser();
 
         Property property = new Property();
         property.setOwner(owner);
