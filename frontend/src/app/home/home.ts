@@ -5,10 +5,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { PropertyService } from './property.service';
 
+
+import { PropertyList } from '../components/property-list/property-list';
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+
+  imports: [CommonModule, ReactiveFormsModule, PropertyList],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -22,6 +26,9 @@ export class Home implements OnInit {
 
   hasSearched: boolean = false; 
   appliedLocation: string = ''; 
+  
+  properties: any[] = [];
+  isLoading: boolean = false;
   
   initialSearch = new FormControl(''); 
 
@@ -67,13 +74,17 @@ export class Home implements OnInit {
       queryParams: cleanParams
     });
 
-    this.propertyService.buscarComFiltros(cleanParams).subscribe({
-      next: (resultados) => {
-        console.log('Imóveis encontrados no Banco de Dados:', resultados);
+    this.isLoading = true;
 
+    this.propertyService.buscarComFiltros(cleanParams).subscribe({
+      next: (resultados: any) => {
+        console.log('Imóveis encontrados no Banco de Dados:', resultados);
+        this.properties = resultados;
+        this.isLoading = false;
       },
       error: (err) => {
         console.error('Erro ao buscar imóveis:', err);
+        this.isLoading = false;
       }
     });
   }
@@ -84,8 +95,8 @@ export class Home implements OnInit {
     this.appliedLocation = ''; 
     this.initialSearch.reset();
     this.filterForm.reset();
+    this.properties = []; 
     
-
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {}

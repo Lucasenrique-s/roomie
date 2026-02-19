@@ -11,14 +11,17 @@
       <p>Repúblicas, quartos e apartamentos para dividir com a sua vibe.</p>
 
       <div class="big-search-box">
-        <input type="text" [formControl]="initialSearch" placeholder="Para qual cidade ou bairro você vai?"
-          (keyup.enter)="onInitialSearch()" />
+        <input 
+          type="text" 
+          [formControl]="initialSearch" 
+          placeholder="Para qual cidade ou bairro você vai?"
+          (keyup.enter)="onInitialSearch()" 
+        />
         <button class="btn-big-search" (click)="onInitialSearch()">Buscar</button>
       </div>
     </div>
   </div>
 </ng-container>
-
 
 <ng-container *ngIf="hasSearched">
   <div class="dashboard-container">
@@ -30,8 +33,12 @@
 
     <div class="search-section" [formGroup]="filterForm">
       <div class="search-bar">
-        <input type="text" formControlName="location" placeholder="Buscar cidade ou bairro..."
-          (keyup.enter)="onFilter()" />
+        <input 
+          type="text" 
+          formControlName="location" 
+          placeholder="Buscar cidade ou bairro..."
+          (keyup.enter)="onFilter()" 
+        />
         <button class="btn-search" (click)="onFilter()">Buscar</button>
       </div>
     </div>
@@ -73,10 +80,11 @@
           <p>Mostrando imóveis para: <strong>{{ appliedLocation || 'Qualquer lugar' }}</strong></p>
         </div>
 
-        <div class="grid-placeholder">
-          <div class="card-skeleton">Espaço para o Card</div>
-          <div class="card-skeleton">Espaço para o Card</div>
-        </div>
+        <app-property-list 
+           [properties]="properties" 
+           [loading]="isLoading">
+        </app-property-list>
+
       </section>
 
     </div>
